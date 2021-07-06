@@ -46,8 +46,8 @@ GLFWmonitor* monitors;
 void getResolution(void);
 
 // camera
-Camera camera(glm::vec3(0.0f, 10.0f, 90.0f));
-float MovementSpeed = 0.5f;
+Camera camera(glm::vec3(0.0f, 0.5f, 0.0f));
+float MovementSpeed = 1.0f;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -59,47 +59,24 @@ double	deltaTime = 0.0f,
 lastFrame = 0.0f;
 
 //Lighting
-glm::vec3 lightPosition(0.0f, 4.0f, -10.0f); // Dirección de la luz --Modificar de acuerdo a la SKYBOX [ANDRE]
-glm::vec3 lightDirection(0.0f, -1.0f, -1.0f);
+glm::vec3 lightPosition(0.0f, 4.0f, 10.0f); // Dirección de la luz --Modificar de acuerdo a la SKYBOX [ANDRE]
+glm::vec3 lightDirection(0.0f, -1.0f, 1.0f);
+
+bool dia = true;
 
 
-float	movAuto_x = 0.0f,
-movAuto_z = 0.0f,
-orienta = 0.0f,
-giroLlantas = 0.0f;
-bool	animacion = false,
-recorrido1 = true,
-recorrido2 = false,
-recorrido3 = false,
-recorrido4 = false,
-avanza = true;
-int	estadoAni = 0;
+
 
 
 //Keyframes (Manipulación y dibujo)
-float	posX = 0.0f,
-posY = 0.0f,
-posZ = 0.0f,
-rotRodIzq = 0.0f,
-giroMonito = 0.0f;
-float	incX = 0.0f,
-incY = 0.0f,
-incZ = 0.0f,
-rotInc = 0.0f,
-giroMonitoInc = 0.0f;
+
 
 #define MAX_FRAMES 9
-int i_max_steps = 60;
-int i_curr_steps = 0;
+
 
 typedef struct _frame
 {
-	//Variables para GUARDAR Key Frames
-	float posX;		//Variable para PosicionX
-	float posY;		//Variable para PosicionY
-	float posZ;		//Variable para PosicionZ
-	float rotRodIzq;
-	float giroMonito;
+
 
 }FRAME;
 
@@ -113,40 +90,24 @@ void saveFrame(void)
 	//printf("frameindex %d\n", FrameIndex);
 	std::cout << "Frame Index = " << FrameIndex << std::endl;
 
-	KeyFrame[FrameIndex].posX = posX;
-	KeyFrame[FrameIndex].posY = posY;
-	KeyFrame[FrameIndex].posZ = posZ;
-
-	KeyFrame[FrameIndex].rotRodIzq = rotRodIzq;
-	KeyFrame[FrameIndex].giroMonito = giroMonito;
 
 	FrameIndex++;
 }
 
 void resetElements(void)
 {
-	posX = KeyFrame[0].posX;
-	posY = KeyFrame[0].posY;
-	posZ = KeyFrame[0].posZ;
 
-	rotRodIzq = KeyFrame[0].rotRodIzq;
-	giroMonito = KeyFrame[0].giroMonito;
 }
 
 void interpolation(void)
 {
-	incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;
-	incY = (KeyFrame[playIndex + 1].posY - KeyFrame[playIndex].posY) / i_max_steps;
-	incZ = (KeyFrame[playIndex + 1].posZ - KeyFrame[playIndex].posZ) / i_max_steps;
 
-	rotInc = (KeyFrame[playIndex + 1].rotRodIzq - KeyFrame[playIndex].rotRodIzq) / i_max_steps;
-	giroMonitoInc = (KeyFrame[playIndex + 1].giroMonito - KeyFrame[playIndex].giroMonito) / i_max_steps;
 
 }
 
 void animate(void)
 {
-	
+
 
 	// ANIMACIONES AQUÍ [ANDRÉ]
 }
@@ -218,30 +179,38 @@ int main()
 		"resources/skybox/back.jpg"
 	};
 
+	vector<std::string> facesNoche
+	{
+		"resources/skybox/rightNoche.jpg",
+		"resources/skybox/leftNoche.jpg",
+		"resources/skybox/topNoche.jpg",
+		"resources/skybox/bottomNoche.jpg",
+		"resources/skybox/frontNoche.jpg",
+		"resources/skybox/backNoche.jpg"
+	};
+
 	Skybox skybox = Skybox(faces);
+	Skybox skyboxNoche = Skybox(facesNoche);
 
 	// Shader configuration
 	// --------------------
 	skyboxShader.use();
 	skyboxShader.setInt("skybox", 0);
 
+	skyboxShader.use();
+	skyboxShader.setInt("skyboxNoche", 0);
+
 	// load models
 	// -----------
-	Model piso("resources/objects/piso/piso.obj");
+	Model pisoCoyo("resources/objects/pisoCoyo/pisoCoyo.obj");
+	Model orilla("resources/objects/orilla1/orilla.obj");
 
-	//Model cubo("resources/objects/cubo/cube02.obj");
+
 
 
 	//Aquí se cargan los modelos 
 
-	for (int i = 0; i < MAX_FRAMES; i++)
-	{
-		KeyFrame[i].posX = 0;
-		KeyFrame[i].posY = 0;
-		KeyFrame[i].posZ = 0;
-		KeyFrame[i].rotRodIzq = 0;
-		KeyFrame[i].giroMonito = 0;
-	}
+
 
 
 
@@ -249,6 +218,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		skyboxShader.setInt("skybox", 0);
+		skyboxShader.setInt("skyboxNoche", 0);
 		lastFrame = SDL_GetTicks();
 
 
@@ -299,11 +269,26 @@ int main()
 		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.75f);
 
 
+
+		for (int j = 0; j <3 ; j++) {
+			for (int i = 0; i < 25; i++) {
+				model = glm::mat4(1.0f);
+				model = glm::translate(model, glm::vec3(0.0f + i * 2, 0.0f, 0.0f + j * 2));
+				staticShader.setMat4("model", model);
+				pisoCoyo.Draw(staticShader);
+
+			}
+		}
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::translate(model, glm::vec3(0.0f,1.0f, 5.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
-		piso.Draw(staticShader);
+		orilla.Draw(staticShader);
+
+
+
+
+
 
 
 
@@ -312,11 +297,17 @@ int main()
 
 		//DIBUJO SKYBOX
 		skyboxShader.use();
-		skybox.Draw(skyboxShader, view, projection, camera);
+		if (dia == true) {
+			skybox.Draw(skyboxShader, view, projection, camera);
+		}
+		else {
+			skyboxNoche.Draw(skyboxShader, view, projection, camera);
+		}
+
 
 		// Limitar el framerate a 60
 		deltaTime = SDL_GetTicks() - lastFrame; // time for full 1 loop
-		
+
 		if (deltaTime < LOOP_TIME)
 		{
 			SDL_Delay((int)(LOOP_TIME - deltaTime));
@@ -325,6 +316,7 @@ int main()
 		glfwPollEvents();
 	}
 
+	skyboxNoche.Terminate();
 	skybox.Terminate();
 
 	glfwTerminate();
@@ -344,39 +336,18 @@ void my_input(GLFWwindow* window, int key, int scancode, int action, int mode)
 		camera.ProcessKeyboard(LEFT, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, (float)deltaTime);
-
-
-
-
-
-
-	if (key == GLFW_KEY_P && action == GLFW_PRESS)
-	{
-		if (play == false && (FrameIndex > 1))
-		{
-			std::cout << "Play animation" << std::endl;
-			resetElements();
-			
-			interpolation();
-
-			play = true;
-			playIndex = 0;
-			i_curr_steps = 0;
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+		if (dia == true) {
+			dia = false;
 		}
-		else
-		{
-			play = false;
-			std::cout << "Not enough Key Frames" << std::endl;
+		else {
+			dia = true;
 		}
+
 	}
 
-	if (key == GLFW_KEY_L && action == GLFW_PRESS)
-	{
-		if (FrameIndex < MAX_FRAMES)
-		{
-			saveFrame();
-		}
-	}
+
+
 }
 
 
@@ -397,7 +368,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; 
+	float yoffset = lastY - ypos;
 
 	lastX = xpos;
 	lastY = ypos;
