@@ -211,7 +211,12 @@ int main()
 	Model banorte("resources/objects/Banorte/Banorte.obj");
 	Model casaHC("resources/objects/CasaHC/casaHC.obj");
 	Model avenida("resources/objects/Avenida/avenida.obj");
-
+	Model tope("resources/objects/topes/tope.obj");
+	Model arbolMaceta("resources/objects/arboles/arbolMaceta.obj"); 
+	Model tel("resources/objects/telefonos/telPublico.obj");
+	Model posteLuz("resources/objects/posteLuz/posLuz.obj");
+	Model banca("resources/objects/banca/banca.obj");
+	Model areasVerdes("resources/objects/areasVerdes/areasVerdes.obj");
 
 
 
@@ -277,7 +282,28 @@ int main()
 
 		//2. DIBUJADO DE MODELOS
 
-		//ENTORNO GENERAL Y SUPERFICIE
+		//*****ENTORNO GENERAL Y SUPERFICIE******
+
+		//TOPES
+		for (int i = 0; i < 20; i++) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(2.5f, -1.0f, -0.6f-(i*1.2)));
+			staticShader.setMat4("model", model);
+			tope.Draw(staticShader);
+		}//Telefono
+		for (int i = 0; i < 3; i++) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, glm::vec3(-4.0f+i, -1.2f, -15.8f));
+			staticShader.setMat4("model", model);
+			tel.Draw(staticShader);
+		}
+
+		//POSTE DE LUZ
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-1.5f, -1.2f, -12.4f));
+		staticShader.setMat4("model", model);
+		posteLuz.Draw(staticShader);
+		
 
 		//DECLARACIÓN DE SUELOS
 		model = glm::mat4(1.0f);
@@ -285,8 +311,85 @@ int main()
 		staticShader.setMat4("model", model);
 		pisoDef.Draw(staticShader);
 
+		//****AREAS VERDES****
+		for (int i = 0; i < 3; i++) {
+			model = glm::mat4(1.0f);
+			if (i == 2) {
+				model = glm::translate(model, glm::vec3(-12.0f - i * 4, -1.5f, -12.6f));
+			}else{
+				model = glm::translate(model, glm::vec3(-12.0f + i * 4, -1.5f, -12.6f));
+			}
 
-		//AVENIDAS
+			model = glm::scale(model, glm::vec3(0.4));
+			staticShader.setMat4("model", model);
+			arbolMaceta.Draw(staticShader);
+			}
+
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.5f, -0.8f, -20.6f));
+		staticShader.setMat4("model", model);
+		areasVerdes.Draw(staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-15.0f, -0.8f, -20.6f));
+		staticShader.setMat4("model", model);
+		areasVerdes.Draw(staticShader);
+
+
+		//Bancas
+		
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-7.4f, -1.0f, -11.2f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-11.4f, -1.0f, -11.2f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-9.4f, -1.0f, -14.4f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-16.0f, -1.0f, -14.4f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-14.5f, -1.0f, -14.4f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-18.0f, -1.0f, -12.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-12.5f, -1.0f, -12.0f));
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		banca.Draw(staticShader);
+
+
+
+
+
+
+	
+		
+		
+
+
+		//****AVENIDAS*****
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(8.5f, - 0.95f,  0.4f));
 		staticShader.setMat4("model", model);
@@ -306,6 +409,7 @@ int main()
 		staticShader.setMat4("model", model);
 		casaHC.Draw(staticShader);
 
+		
 
 
 
@@ -392,7 +496,7 @@ void my_input(GLFWwindow* window, int key, int scancode, int action, int mode)
 		movy += 0.2f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) { //Imprime las coordenadas en pantalla para saber donde va el elemento
-		std::cout << "COORDENADAS EN X, Y,  Z " << movx << "  " << movy << "  " << movz << std::endl;
+		std::cout << "COORDENADAS EN X, Y,  Z " << movx << "f," << movy << "f," << movz <<"f" << std::endl;
 
 	}
 
