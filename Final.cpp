@@ -64,6 +64,11 @@ glm::vec3 lightDirection(0.0f, -1.0f, 1.0f);
 
 bool dia = true;
 
+//Debuggeo para posición de elementos
+float movx = 0;
+float movy = 0;
+float movz = 0;
+
 
 
 
@@ -200,10 +205,12 @@ int main()
 	skyboxShader.use();
 	skyboxShader.setInt("skyboxNoche", 0);
 
-	// load models
+	// 1. CARGA DE MODELOS
 	// -----------
-	Model pisoCoyo("resources/objects/pisoCoyo/pisoCoyo.obj");
-	Model orilla("resources/objects/orilla1/orilla.obj");
+	Model pisoDef("resources/objects/pisoDef/pisoDef.obj");
+	Model banorte("resources/objects/Banorte/Banorte.obj");
+	Model casaHC("resources/objects/CasaHC/casaHC.obj");
+	Model avenida("resources/objects/Avenida/avenida.obj");
 
 
 
@@ -268,22 +275,37 @@ int main()
 		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.75f);
 
+		//2. DIBUJADO DE MODELOS
 
+		//ENTORNO GENERAL Y SUPERFICIE
 
-		for (int j = 0; j <3 ; j++) {
-			for (int i = 0; i < 25; i++) {
-				model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(0.0f + i * 2, 0.0f, 0.0f + j * 2));
-				staticShader.setMat4("model", model);
-				pisoCoyo.Draw(staticShader);
-
-			}
-		}
+		//DECLARACIÓN DE SUELOS
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f,1.0f, 5.0f));
+		model = glm::translate(model, glm::vec3(-10.0f, -1.0f, -12.0f));
+		staticShader.setMat4("model", model);
+		pisoDef.Draw(staticShader);
+
+
+		//AVENIDAS
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(8.5f, - 0.95f,  0.4f));
+		staticShader.setMat4("model", model);
+		avenida.Draw(staticShader);
+
+		//EDIFICIOS
+		//BANORTE
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0, -1.5f, 4));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f,1.0f,0.0f));
+		staticShader.setMat4("model", model);
+		banorte.Draw(staticShader);
+		//Casa de Hernán Cortéz
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-15.5f,-0.8f,1.2f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
-		orilla.Draw(staticShader);
+		casaHC.Draw(staticShader);
+
 
 
 
@@ -343,6 +365,34 @@ void my_input(GLFWwindow* window, int key, int scancode, int action, int mode)
 		else {
 			dia = true;
 		}
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		movx += 0.5f;
+	}
+
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			movx -= 0.5f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+
+		movz += 0.2f;
+	
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+			movz -= 0.2f;
+
+	}
+	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+		movy -= 0.2f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+		movy += 0.2f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) { //Imprime las coordenadas en pantalla para saber donde va el elemento
+		std::cout << "COORDENADAS EN X, Y,  Z " << movx << "  " << movy << "  " << movz << std::endl;
 
 	}
 
